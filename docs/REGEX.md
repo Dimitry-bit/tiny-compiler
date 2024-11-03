@@ -19,3 +19,7 @@ Regex:
 ```regex
 [0-9]+(\.[0-9]+)?
 ```
+
+DFA:
+
+![number-dfa.svg](./DFA/number-dfa.svg)
