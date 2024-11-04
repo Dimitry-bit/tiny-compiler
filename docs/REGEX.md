@@ -23,3 +23,15 @@ Regex:
 DFA:
 
 ![number-dfa.svg](./DFA/number-dfa.svg)
+
+### Arithmetic Operators + Assignment Operator:
+
+Regex:
+
+```regex
++ | - | * | / | :=
+```
+
+DFA:
+
+![arithmetic-operators-dfa.svg](./DFA/arithmetic-operators-dfa.svg)
