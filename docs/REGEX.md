@@ -24,6 +24,18 @@ DFA:
 
 ![number-dfa.svg](./DFA/number-dfa.svg)
 
+### Identifier
+
+Regex:
+
+```regex
+[a-zA-Z][a-zA-Z0-9]*
+```
+
+DFA:
+
+![identifier-dfa.svg](./DFA/identifier-dfa.svg)
+
 ### Arithmetic Operators + Assignment Operator:
 
 Regex:
