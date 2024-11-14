@@ -10,26 +10,13 @@ namespace TinyCompiler
 
         public static void Compile(string sourceCode)
         {
+            Errors.Error_List.Clear();
+
             //Scanner
             Scanner.Scan(sourceCode);
 
             //Parser
             //Sematic Analysis
-        }
-
-        static void SplitLexemes(string sourceCode)
-        {
-            string[] lexemes = sourceCode.Split(' ');
-
-            for (int i = 0; i < lexemes.Length; i++)
-            {
-                if (lexemes[i].Contains("\r\n"))
-                {
-                    lexemes[i] = lexemes[i].Replace("\r\n", string.Empty);
-                }
-
-                Lexemes.Add(lexemes[i]);
-            }
         }
     }
 }
