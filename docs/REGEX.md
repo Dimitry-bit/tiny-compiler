@@ -34,4 +34,4 @@ Regex:
 
 DFA:
 
-![arithmetic-operators-dfa.svg](./DFA/arithmetic-operators-dfa.svg)
+![arithmetic-operators-dfa.svg](./DFA/arith_assign-dfa.svg)
