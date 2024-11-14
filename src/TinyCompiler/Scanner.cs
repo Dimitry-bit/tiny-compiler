@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace TinyCompiler
 {
@@ -165,41 +166,40 @@ namespace TinyCompiler
 
         private void ReadString()
         {
+            char prev = '\0';
             while (!IsEOF())
             {
-                if ((Peak() != '\\') && (PeakNext() == '"'))
-                {
-                    Read();
+                if ((Peak() == '"') && (prev != '\\'))
                     break;
-                }
-                else
-                {
-                    Read();
-                }
+
+                prev = Read();
             }
 
             if (Match('"'))
-            {
-                Read();
                 AddToken(TokenClass.StringLiteral);
-            }
             else
-            {
                 Errors.Add(_linenumber, "Unterminated String");
-            }
         }
 
         private void ReadComment()
         {
-            char c;
-            while (((c = Read()) != '*') && (Peak() != '/') && !IsEOF())
+            while (!IsEOF())
             {
-                if (c == '\n')
+                if ((Peak() == '*') && (PeakNext() == '/'))
+                {
+                    Read();
+                    break;
+                }
+
+                if (Read() == '\n')
                     _linenumber++;
+
             }
 
             if (Peak() == '/')
                 Read();
+            else
+                Errors.Add(_linenumber, "Unterminated comment");
         }
 
         private void AddToken(TokenClass type)
