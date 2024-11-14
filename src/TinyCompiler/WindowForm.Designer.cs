@@ -48,6 +48,7 @@
             this.tfSourceCode.Name = "tfSourceCode";
             this.tfSourceCode.Size = new System.Drawing.Size(278, 452);
             this.tfSourceCode.TabIndex = 0;
+            this.tfSourceCode.WordWrap = false;
             // 
             // btnCompile
             // 
@@ -73,7 +74,7 @@
             this.tblTokens.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Column1,
             this.Column2});
-            this.tblTokens.Location = new System.Drawing.Point(329, 51);
+            this.tblTokens.Location = new System.Drawing.Point(329, 44);
             this.tblTokens.Margin = new System.Windows.Forms.Padding(2);
             this.tblTokens.Name = "tblTokens";
             this.tblTokens.ReadOnly = true;
@@ -110,7 +111,7 @@
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(326, 31);
+            this.label2.Location = new System.Drawing.Point(326, 24);
             this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(64, 18);
@@ -130,6 +131,9 @@
             // 
             // tfErrors
             // 
+            this.tfErrors.BackColor = System.Drawing.SystemColors.Control;
+            this.tfErrors.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tfErrors.ForeColor = System.Drawing.Color.Red;
             this.tfErrors.Location = new System.Drawing.Point(329, 363);
             this.tfErrors.Multiline = true;
             this.tfErrors.Name = "tfErrors";
