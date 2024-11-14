@@ -24,6 +24,18 @@ DFA:
 
 ![number-dfa.svg](./DFA/number-dfa.svg)
 
+### String
+
+Regex:
+
+```regex
+"([a-zA-Z0-9-!#$%&'()*+,./:;<=>?@[\\\]_`{|}~]|(\"))*"
+```
+
+DFA:
+
+![string-dfa.svg](./DFA/string-dfa.svg)
+
 ## Other Operators:
 
 Regex:
