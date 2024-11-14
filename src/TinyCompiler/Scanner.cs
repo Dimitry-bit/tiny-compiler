@@ -1,14 +1,19 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace TinyCompiler
 {
     public enum TokenClass
     {
-        Begin, Call, Declare, End, Do, Else, EndIf, EndUntil, EndWhile, If, Integer,
-        Parameters, Procedure, Program, Read, Real, Set, Then, Until, While, Write,
-        Dot, Semicolon, Comma, LParanthesis, RParanthesis, EqualOp, LessThanOp,
-        GreaterThanOp, NotEqualOp, PlusOp, MinusOp, MultiplyOp, DivideOp,
-        Idenifier, Constant
+        Undefined,
+        Int, Float, String,
+        Read, Write, Repeat, Until, If, ElseIf, Else, End, Endl, Then, Return,
+        OP_Minus, OP_Plus, OP_Multiply, OP_Divide, OP_Assign, OP_LE, OP_GE,
+        OP_EQ, OP_NOT_EQ, OP_AND, OP_OR, Comma, Semicolon,
+        LeftCurlyBraces, RightCurlyBraces, LeftParentheses, RightParentheses,
+        Identifier, Number, StringLiteral,
+        Main,
     }
 
     public class Token
@@ -20,112 +25,202 @@ namespace TinyCompiler
     public class Scanner
     {
         public List<Token> Tokens = new List<Token>();
-        readonly Dictionary<string, TokenClass> ReservedWords = new Dictionary<string, TokenClass>();
-        readonly Dictionary<string, TokenClass> Operators = new Dictionary<string, TokenClass>();
+        readonly static Dictionary<string, TokenClass> ReservedWords = new Dictionary<string, TokenClass>();
+        readonly static Dictionary<string, TokenClass> Operators = new Dictionary<string, TokenClass>();
 
         public Scanner()
         {
-            ReservedWords.Add("IF", TokenClass.If);
-            ReservedWords.Add("BEGIN", TokenClass.Begin);
-            ReservedWords.Add("CALL", TokenClass.Call);
-            ReservedWords.Add("DECLARE", TokenClass.Declare);
-            ReservedWords.Add("END", TokenClass.End);
-            ReservedWords.Add("DO", TokenClass.Do);
-            ReservedWords.Add("ELSE", TokenClass.Else);
-            ReservedWords.Add("ENDIF", TokenClass.EndIf);
-            ReservedWords.Add("ENDUNTIL", TokenClass.EndUntil);
-            ReservedWords.Add("ENDWHILE", TokenClass.EndWhile);
-            ReservedWords.Add("INTEGER", TokenClass.Integer);
-            ReservedWords.Add("PARAMETERS", TokenClass.Parameters);
-            ReservedWords.Add("PROCEDURE", TokenClass.Procedure);
-            ReservedWords.Add("PROGRAM", TokenClass.Program);
-            ReservedWords.Add("READ", TokenClass.Read);
-            ReservedWords.Add("REAL", TokenClass.Real);
-            ReservedWords.Add("SET", TokenClass.Set);
-            ReservedWords.Add("THEN", TokenClass.Then);
-            ReservedWords.Add("UNTIL", TokenClass.Until);
-            ReservedWords.Add("WHILE", TokenClass.While);
-            ReservedWords.Add("WRITE", TokenClass.Write);
+            ReservedWords.Add("int", TokenClass.Int);
+            ReservedWords.Add("float", TokenClass.Float);
+            ReservedWords.Add("string", TokenClass.String);
+            ReservedWords.Add("read", TokenClass.Read);
+            ReservedWords.Add("write", TokenClass.Write);
+            ReservedWords.Add("repeat", TokenClass.Repeat);
+            ReservedWords.Add("until", TokenClass.Until);
+            ReservedWords.Add("if", TokenClass.If);
+            ReservedWords.Add("elseif", TokenClass.ElseIf);
+            ReservedWords.Add("else", TokenClass.Else);
+            ReservedWords.Add("end", TokenClass.End);
+            ReservedWords.Add("endl", TokenClass.Endl);
+            ReservedWords.Add("then", TokenClass.Then);
+            ReservedWords.Add("return", TokenClass.Return);
+            ReservedWords.Add("main", TokenClass.Main);
 
-            Operators.Add(".", TokenClass.Dot);
-            Operators.Add(";", TokenClass.Semicolon);
+            Operators.Add("+", TokenClass.OP_Plus);
+            Operators.Add("-", TokenClass.OP_Minus);
+            Operators.Add("*", TokenClass.OP_Multiply);
+            Operators.Add("/", TokenClass.OP_Divide);
+            Operators.Add(":=", TokenClass.OP_Assign);
+            Operators.Add("<", TokenClass.OP_LE);
+            Operators.Add(">", TokenClass.OP_GE);
+            Operators.Add("=", TokenClass.OP_EQ);
+            Operators.Add("<>", TokenClass.OP_NOT_EQ);
+            Operators.Add("&&", TokenClass.OP_AND);
+            Operators.Add("||", TokenClass.OP_OR);
             Operators.Add(",", TokenClass.Comma);
-            Operators.Add("(", TokenClass.LParanthesis);
-            Operators.Add(")", TokenClass.RParanthesis);
-            Operators.Add("=", TokenClass.EqualOp);
-            Operators.Add("<", TokenClass.LessThanOp);
-            Operators.Add(">", TokenClass.GreaterThanOp);
-            Operators.Add("!", TokenClass.NotEqualOp);
-            Operators.Add("+", TokenClass.PlusOp);
-            Operators.Add("-", TokenClass.MinusOp);
-            Operators.Add("*", TokenClass.MultiplyOp);
-            Operators.Add("/", TokenClass.DivideOp);
+            Operators.Add(";", TokenClass.Semicolon);
+            Operators.Add("{", TokenClass.LeftCurlyBraces);
+            Operators.Add("}", TokenClass.RightCurlyBraces);
+            Operators.Add("(", TokenClass.LeftParentheses);
+            Operators.Add(")", TokenClass.RightParentheses);
         }
 
-        public void Scan(string SourceCode)
+        public void Scan(string sourceCode)
         {
-            for (int i = 0; i < SourceCode.Length; i++)
+            Errors.Error_List.Clear();
+            Tokens.Clear();
+
+            int lineCount = 1;
+            for (int i = 0; i < sourceCode.Length; i++)
             {
                 int j = i;
-                char c = SourceCode[i];
+                char c = sourceCode[i];
                 string lex = c.ToString();
 
-                if (c == ' ' || c == '\r' || c == '\n')
+                if (string.IsNullOrWhiteSpace(lex))
+                {
+                    if (c == '\n')
+                    {
+                        lineCount++;
+                    }
+
                     continue;
-
-                if (c >= 'A' && c <= 'z') //if you read a character
-                {
-
                 }
 
-                else if (c >= '0' && c <= '9')
+                // skip comments
+                if (c == '/')
                 {
+                    if ((j + 1 < sourceCode.Length) && (sourceCode[++j] == '*'))
+                    {
+                        for (j += 1; j < sourceCode.Length; j++)
+                        {
+                            c = sourceCode[j];
 
+                            if (c == '/' && sourceCode[j - 1] == '*')
+                            {
+                                break;
+                            }
+                        }
+
+                        i = j;
+                        continue;
+                    }
                 }
-                else if (c == '{')
-                {
 
+                if (char.IsLetter(c))
+                {
+                    for (i += 1; i < sourceCode.Length; i++)
+                    {
+                        if (!char.IsLetterOrDigit(sourceCode[i]))
+                        {
+                            --i;
+                            break;
+                        }
+
+                        c = sourceCode[i];
+                        lex += c;
+                    }
                 }
-                else
+                else if (char.IsDigit(c))
                 {
+                    for (i += 1; i < sourceCode.Length; i++)
+                    {
+                        if (!char.IsDigit(sourceCode[i]) && (sourceCode[i] != '.'))
+                        {
+                            --i;
+                            break;
+                        }
 
+                        c = sourceCode[i];
+                        lex += c;
+                    }
+                }
+                else if (c == '"')
+                {
+                    for (i += 1; i < sourceCode.Length; i++)
+                    {
+                        c = sourceCode[i];
+                        lex += c;
+
+                        if ((c == '"') && (sourceCode[i - 1] != '\\'))
+                        {
+                            break;
+                        }
+                    }
+                }
+                else if (Operators.Any((op) => (op.Key.Length > 1) && (op.Key.First() == c)))
+                {
+                    if ((i + 1 < sourceCode.Length) && Operators.ContainsKey(lex + sourceCode[i + 1]))
+                    {
+                        c = sourceCode[++i];
+                        lex += c;
+                    }
+                }
+
+                if (!FindTokenClass(lex))
+                {
+                    Errors.Error_List.Add($"line {lineCount}: Undefined lexeme '{lex}'. {(lex.Length == 1 ? $"(ASCII: {(int)lex.First()})" : "")}");
                 }
             }
 
             Compiler.TokenStream = Tokens;
         }
 
-        private void FindTokenClass(string Lex)
+        private bool FindTokenClass(string lex)
         {
-            TokenClass tokenClass;
-            Token Tok = new Token();
-            Tok.lex = Lex;
+            Token token = new Token
+            {
+                lex = lex,
+                type = TokenClass.Undefined
+            };
 
-            //Is it a reserved word?
-
-            //Is it an identifier?
-
-            //Is it a Constant?
-
-            //Is it an operator?
+            if (ReservedWords.ContainsKey(lex))
+            {
+                token.type = ReservedWords[lex];
+            }
+            else if (Operators.ContainsKey(lex))
+            {
+                token.type = Operators[lex];
+            }
+            else if (IsIdentifier(lex))
+            {
+                token.type = TokenClass.Identifier;
+            }
+            else if (IsNumber(lex))
+            {
+                token.type = TokenClass.Number;
+            }
+            else if (IsStringLiteral(lex))
+            {
+                token.type = TokenClass.StringLiteral;
+            }
 
             //Is it an undefined?
+            if (token.type == TokenClass.Undefined)
+            {
+                return false;
+            }
+
+            Tokens.Add(token);
+            return true;
         }
 
         private bool IsIdentifier(string lex)
         {
-            bool isValid = true;
-            // Check if the lex is an identifier or not.
-
-            return isValid;
+            Regex regex = new Regex(@"^[A-Za-z]+[A-Za-z0-9]*$");
+            return regex.IsMatch(lex);
         }
 
-        private bool IsConstant(string lex)
+        private bool IsNumber(string lex)
         {
-            bool isValid = true;
-            // Check if the lex is a constant (Number) or not.
+            Regex regex = new Regex(@"^[0-9]+(\.[0-9]+)?$");
+            return regex.IsMatch(lex);
+        }
 
-            return isValid;
+        private bool IsStringLiteral(string lex)
+        {
+            Regex regex = new Regex(@"^.*""$");
+            return regex.IsMatch(lex);
         }
     }
 }
