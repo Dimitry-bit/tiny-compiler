@@ -71,3 +71,15 @@ Regex:
 DFA:
 
 ![arithmetic-operators-dfa.svg](./DFA/arith_assign-dfa.svg)
+
+### Comment
+
+Regex:
+
+```regex
+/\*[a-zA-Z0-9-*!#$%&'()+,./:;<=>?@[]_{|}~]*\*/
+```
+
+DFA:
+
+![comment-dfa.svg](./DFA/comment-dfa.svg)
