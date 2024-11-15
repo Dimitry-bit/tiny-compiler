@@ -83,3 +83,27 @@ Regex:
 DFA:
 
 ![comment-dfa.svg](./DFA/comment-dfa.svg)
+
+### Boolean Operators
+
+Regex:
+
+```regex
+&& | ||
+```
+
+DFA:
+
+![boolean-op-dfa.svg](./DFA/boolean-op-dfa.svg)
+
+### Condition Operators
+
+Regex:
+
+```regex
+< | > | = | <>
+```
+
+DFA:
+
+![condition-op-dfa.svg](./DFA/condition-op-dfa.svg)
