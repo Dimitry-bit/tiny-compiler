@@ -5,7 +5,7 @@
 Regex:
 
 ```regex
-int|float|string|read|write|repeat|until|if|elseif|else|then|return|end|endl|main
+int|float|string|read|write|repeat|until|if|elseif|else|then|return|end|endl
 ```
 
 DFA:
