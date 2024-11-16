@@ -172,6 +172,10 @@ namespace TinyCompiler
                 if ((Peak() == '"') && (prev != '\\'))
                     break;
 
+                // No multiline strings
+                if (Peak() == '\n')
+                    break;
+
                 prev = Read();
             }
 
