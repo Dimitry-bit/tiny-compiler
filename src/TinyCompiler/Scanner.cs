@@ -71,10 +71,10 @@ namespace TinyCompiler
 
                 switch (c)
                 {
-                    case '{': AddToken(TokenClass.RightBrace); break;
-                    case '}': AddToken(TokenClass.LeftBrace); break;
-                    case '(': AddToken(TokenClass.RightParen); break;
-                    case ')': AddToken(TokenClass.LeftParen); break;
+                    case '{': AddToken(TokenClass.LeftBrace); break;
+                    case '}': AddToken(TokenClass.RightBrace); break;
+                    case '(': AddToken(TokenClass.LeftParen); break;
+                    case ')': AddToken(TokenClass.RightParen); break;
                     case ';': AddToken(TokenClass.Semicolon); break;
                     case ',': AddToken(TokenClass.Comma); break;
                     case '-': AddToken(TokenClass.Minus); break;
