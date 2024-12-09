@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Windows.Forms;
 
 namespace TinyCompiler
 {
@@ -25,8 +24,45 @@ namespace TinyCompiler
 
     public class Token
     {
+        private readonly static Dictionary<TokenClass, string> tokenToString = new Dictionary<TokenClass, string>
+        {
+            {TokenClass.LeftBrace, "{" },
+            {TokenClass.RightBrace, "}" },
+            {TokenClass.LeftParen, "(" },
+            {TokenClass.RightParen, ")" },
+            {TokenClass.Minus, "-" },
+            {TokenClass.Plus, "+" },
+            {TokenClass.Multiply, "-" },
+            {TokenClass.Divide, "/" },
+            {TokenClass.Assign, ":=" },
+            {TokenClass.Less, "<" },
+            {TokenClass.Greater, ">" },
+            {TokenClass.Equal, "=" },
+            {TokenClass.NotEqual, "<>" },
+            {TokenClass.And, "&&" },
+            {TokenClass.Or, "||" },
+            {TokenClass.Comma, "," },
+            {TokenClass.Semicolon, ";" },
+        };
+
         public string lex;
         public TokenClass type;
+        public int line;
+
+        public static string TokenToString(TokenClass tokenClass)
+        {
+            if (tokenToString.ContainsKey(tokenClass))
+            {
+                return tokenToString[tokenClass];
+            }
+
+            return tokenClass.ToString().ToLower();
+        }
+
+        public override string ToString()
+        {
+            return TokenToString(type);
+        }
     }
 
     public class Scanner
@@ -212,6 +248,7 @@ namespace TinyCompiler
             {
                 lex = _sourceCode.Substring(_start, _current - _start),
                 type = type,
+                line = _linenumber,
             };
 
             Tokens.Add(token);
