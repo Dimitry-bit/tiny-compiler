@@ -1,80 +1,91 @@
 # Tiny Languages Context Free Grammar
 
-1. **Program** -> **Function_Statements** **Main_Function**
+1. **Program** -> **FunctionStatements** **MainFunction**
 
-2. **Main_Function** -> **Datatype** _main()_ **Function_Body**
+2. **MainFunction** -> **Datatype** _main()_ **FunctionBody**
 
-3. **Function_Statement** -> **Function_Declaration** **Function_Body**
+3. **FunctionStatement** -> **FunctionDeclaration** **FunctionBody**
 
-4. **Function_Statements** -> **Function_Statement** **Function_Statements** | $\epsilon$
+4. **FunctionStatements** -> **FunctionStatement** **FunctionStatements** | $\epsilon$
 
-5. **Statements** -> **Statement** **Statements** | $\epsilon$
+5. **FunctionDeclaration** -> **Datatype** **Identifier** _(_ **ParameterList** _)_
 
-6. **Statement** -> **Declaration_Statement**
-                  | **Assignment_Statement**
-                  | **Write_Statement**
-                  | **Read_Statement**
-                  | **If_Statement**
-                  | **Repeat_Statement**
+6. **FunctionBody** -> _{_ **Statements** **ReturnStatement** _}_
 
-7. **Function_Body** -> _{_ **Statements** **Return_Statement** _}_
+7. **FunctionCall** -> **Identifier** _(_ **ArgumentList** _)_
 
-8. **Parameter_List** -> **Parameter** **Parameters** | $\epsilon$
+8. **Arguments** -> _,_ **Identifier** **Identifiers** | $\epsilon$
 
-9. **Parameters** -> _,_ **Parameter** **Parameters** | $\epsilon$
+9. **ArgumentList** -> **Identifier** **Identifiers** | $\epsilon$
 
 10. **Parameter** -> **Datatype** **Identifier**
 
-11. **Function_Declaration** -> **Datatype** **FunctionName** _(_ **Parameters_List** _)_
+11. **Parameters** -> _,_ **Parameter** **Parameters** | $\epsilon$
 
-12. **FunctionName** -> **Identifier**
+12. **ParameterList** -> **Parameter** **Parameters** | $\epsilon$
 
-13. **Repeat_Statement** -> _repeat_ **Statements** _until_ **Condition_Statement**
+13. **Statements** -> **Statement** **Statements** | $\epsilon$
 
-14. **If_Statement** -> _if_ **Condition_Statement** _then_ **Statements** ( **Else_If_Statement** | **Else_Statement** | $\epsilon$ ) _end_
+14. **Statement** -> **DeclarationStatement**
+                  | **AssignmentStatement**
+                  | **WriteStatement**
+                  | **ReadStatement**
+                  | **IfStatement**
+                  | **RepeatStatement**
 
-15. **Else_If_Statement** ->  _elseif_ **Condition_Statement** _then_ **Statements** ( **Else_If_Statement** | **Else_Statement** )
+15. **RepeatStatement** -> _repeat_ **Statements** _until_ **ConditionStatement**
 
-16. **Else_Statement** -> _else_ **Statements**
+16. **IfStatement** -> _if_ **ConditionStatement** _then_ **Statements** ( **ElseIfStatement** | **ElseStatement** | $\epsilon$ ) _end_
 
-17. **Declaration_Statement** -> **Datatype** **Identifier** **Identifiers** _;_
+17. **ElseIfStatement** ->  _elseif_ **ConditionStatement** _then_ **Statements** ( **ElseIfStatement** | **ElseStatement** | $\epsilon$ )
 
-18. **Write_Statement** -> _write_ ( **Expression** | _endl_ ) _;_
+18. **ElseStatement** -> _else_ **Statements**
 
-19. **Read_Statement** -> _read_ **Identifier** _;_
+19. **WriteStatement** -> _write_ ( **Expression** | _endl_ ) _;_
 
-20. **Return_Statement** -> _return_ **Expression** _;_
+20. **ReadStatement** -> _read_ **Identifier** _;_
 
-21. **Assignment_Statement** -> **Identifier** _:=_ **Expression** _;_
+21. **ReturnStatement** -> _return_ **Expression** _;_
 
-22. **Condition_List** -> **Boolean_Operator** **Condition** **Condition_List** | $\epsilon$
+22. **AssignmentStatement** -> **Identifier** _:=_ **Expression** _;_
 
-23. **Condition_Statement** -> **Condition** **Condition_List**
+23. **ConditionStatement** -> **Condition** **Conditions**
 
-24. **Datatype** -> _int_ | _float_ | _string_
+24. **Condition** -> **Identifier** **ConditionOperator** **Term**
 
-25. **Boolean_Operators** -> _&&_ | _||_
+25. **Conditions** -> **BooleanOperator** **Condition** **Conditions** | $\epsilon$
 
-26. **Condition_Operators** -> _<_ | _>_ | _=_ | _<>_
+26. **BooleanOperators** -> _&&_ | _||_
 
-27. **Condition** -> **Identifier** **Condition_Operator** **Term**
+27. **ConditionOperators** -> _<_ | _>_ | _=_ | _<>_
 
-28. **Expression** -> **String**
-                    | **Term**
+28. **DeclarationStatement** -> **Datatype** **DeclarationList** _;_
+
+29. **Declaration** -> **AssignmentStatement** | **Identifier**
+
+30. **Declarations** -> _,_ **Declaration** **Declarations** | $\epsilon$
+
+31. **DeclarationList** -> **Declaration** **Declarations**
+
+32. **Datatype** -> _int_ | _float_ | _string_
+
+33. **Term** -> **Number**
+              | **Identifier**
+              | **FunctionCall**
+
+34. **Expression** -> **String**
                     | **Equation**
 
-29. **Term** -> **Number**
-              | **Identifier**
-              | **Function_Call**
+35. **Equation** -> **EquationTerm** **EquationDash**
 
-30. **Arithmetic_Operator** -> _+_ | _-_ | _*_ | _/_
+36. **EquationDash** -> **AddOperator** **EquationTerm** **EquationDash** | $\epsilon$
 
-31. **Function_Call** -> **Identifier** _(_ **Identifier_List** _)_
+37. **EquationTerm** -> **Factor** **EquationTermDash**
 
-32. **Identifier_List** -> **Identifier** **Identifiers** | $\epsilon$
+38. **EquationTermDash** -> **MulOperator** **Factor** **EquationTermDash** | $\epsilon$
 
-33. **Identifiers** -> _,_ **Identifier** **Identifiers** | $\epsilon$
+39. **Factor** -> _(_ **Equation** _)_ | **Term**
 
-34. **Equation_Term** -> **Term** | _(_ **Equation** _)_
+40. **AddOperator** -> _+_ | _-_
 
-35. **Equation** -> **Equation_Term** **Arithmetic_Operator** **Equation_Term**
+41. **MulOperator** -> _*_ | _/_
