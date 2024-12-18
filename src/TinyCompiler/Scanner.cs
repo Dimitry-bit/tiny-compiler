@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Windows.Forms;
 
 namespace TinyCompiler
 {
@@ -27,6 +26,7 @@ namespace TinyCompiler
     {
         public string lex;
         public TokenClass type;
+        public int line;
     }
 
     public class Scanner
@@ -212,6 +212,7 @@ namespace TinyCompiler
             {
                 lex = _sourceCode.Substring(_start, _current - _start),
                 type = type,
+                line = _linenumber,
             };
 
             Tokens.Add(token);
