@@ -11,6 +11,7 @@ namespace TinyCompiler
         {
             Errors.Error_List.Clear();
             TokenStream.Clear();
+            treeRoot = null;
 
             //Scanner
             Scanner scanner = new Scanner(sourceCode);
