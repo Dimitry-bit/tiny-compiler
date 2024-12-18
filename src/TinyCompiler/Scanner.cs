@@ -142,7 +142,7 @@ namespace TinyCompiler
 
         private void ReadIdentifier()
         {
-            while (char.IsLetterOrDigit(Peak()))
+            while (char.IsLetterOrDigit(Peek()))
                 Read();
 
             string lex = _sourceCode.Substring(_start, _current - _start);
@@ -151,17 +151,17 @@ namespace TinyCompiler
 
         private void ReadNumber()
         {
-            while (char.IsDigit(Peak()))
+            while (char.IsDigit(Peek()))
                 Read();
 
-            if ((Peak() == '.') && char.IsDigit(PeakNext()))
+            if ((Peek() == '.') && char.IsDigit(PeakNext()))
             {
                 // Read '.'
                 Read();
 
-                while (char.IsDigit(Peak()))
+                while (char.IsDigit(Peek()))
                     Read();
-            } else if (char.IsLetter(Peak())) {
+            } else if (char.IsLetter(Peek())) {
                 Read();
                 Errors.Add(_linenumber, "illegal identifier");
                 return;
@@ -175,11 +175,11 @@ namespace TinyCompiler
             char prev = '\0';
             while (!IsEOF())
             {
-                if ((Peak() == '"') && (prev != '\\'))
+                if ((Peek() == '"') && (prev != '\\'))
                     break;
 
                 // No multiline strings
-                if (Peak() == '\n')
+                if (Peek() == '\n')
                     break;
 
                 prev = Read();
@@ -195,7 +195,7 @@ namespace TinyCompiler
         {
             while (!IsEOF())
             {
-                if ((Peak() == '*') && (PeakNext() == '/'))
+                if ((Peek() == '*') && (PeakNext() == '/'))
                 {
                     Read();
                     break;
@@ -206,7 +206,7 @@ namespace TinyCompiler
 
             }
 
-            if (Peak() == '/')
+            if (Peek() == '/')
                 Read();
             else
                 Errors.Add(_linenumber, "unterminated comment, expected '*/'");
@@ -226,7 +226,7 @@ namespace TinyCompiler
 
         private char Read() => _sourceCode[_current++];
 
-        private char Peak()
+        private char Peek()
         {
             if (IsEOF())
                 return '\0';
