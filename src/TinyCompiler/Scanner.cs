@@ -31,8 +31,6 @@ namespace TinyCompiler
 
     public class Scanner
     {
-        public List<Token> Tokens = new List<Token>();
-
         private readonly static Dictionary<string, TokenClass> _keywords = new Dictionary<string, TokenClass>{
             {"int", TokenClass.Int},
             {"float", TokenClass.Float},
@@ -50,16 +48,20 @@ namespace TinyCompiler
             {"return", TokenClass.Return},
         };
 
-        private string _sourceCode;
-        private int _start;
-        private int _current;
+        private readonly List<Token> _tokens = new List<Token>();
+        private readonly string _sourceCode;
+        private int _start = 0;
+        private int _current = 0;
         private int _linenumber = 1;
 
-        public List<Token> Scan(string sourceCode)
-        {
-            Tokens.Clear();
-
+        public Scanner(string sourceCode) {
             _sourceCode = sourceCode;
+        }
+
+        public List<Token> Scan()
+        {
+            _tokens.Clear();
+
             _linenumber = 1;
             _start = 0;
             _current = 0;
@@ -135,7 +137,7 @@ namespace TinyCompiler
                 }
             }
 
-            return Tokens;
+            return _tokens;
         }
 
         private void ReadIdentifier()
@@ -219,7 +221,7 @@ namespace TinyCompiler
                 line = _linenumber,
             };
 
-            Tokens.Add(token);
+            _tokens.Add(token);
         }
 
         private char Read() => _sourceCode[_current++];

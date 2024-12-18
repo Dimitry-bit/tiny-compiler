@@ -17,22 +17,23 @@ namespace TinyCompiler
 
     public class Parser
     {
-        public Node root;
-        private int _inputPointer;
-        private List<Token> _tokenStream;
+        private readonly List<Token> _tokens;
+        private int _inputPointer = 0;
 
-        public Node Parse(List<Token> tokenStream)
+        public Parser(List<Token> tokens) {
+            _tokens = tokens;
+        }
+
+        public Node Parse()
         {
             _inputPointer = 0;
-            _tokenStream = tokenStream;
 
-            if (!_tokenStream.Any())
+            if (!_tokens.Any())
             {
                 return null;
             }
 
-            root = Program();
-            return root;
+            return Program();
         }
 
         private Node Program() {
@@ -528,18 +529,18 @@ namespace TinyCompiler
         private Token Peek()
         {
             if (IsAtEnd()) return new Token { line = PreviousToken().line, type = TokenClass.Undefined };
-            return _tokenStream[_inputPointer];
+            return _tokens[_inputPointer];
         }
 
         private Token Peek2()
         {
-            if (_inputPointer + 1 >= _tokenStream.Count) return new Token { line = Peek().line, type = TokenClass.Undefined };
-            return _tokenStream[_inputPointer + 1];
+            if (_inputPointer + 1 >= _tokens.Count) return new Token { line = Peek().line, type = TokenClass.Undefined };
+            return _tokens[_inputPointer + 1];
         }
 
-        private bool IsAtEnd() => _inputPointer >= _tokenStream.Count;
+        private bool IsAtEnd() => _inputPointer >= _tokens.Count;
 
-        private Token PreviousToken() => _tokenStream[_inputPointer - 1];
+        private Token PreviousToken() => _tokens[_inputPointer - 1];
 
         private Node PreviousNode() => ToNode(PreviousToken());
 
@@ -570,7 +571,7 @@ namespace TinyCompiler
 
         private bool Check2(params TokenClass[] types)
         {
-            if (_inputPointer + 1 >= _tokenStream.Count)
+            if (_inputPointer + 1 >= _tokens.Count)
             {
                 return false;
             }

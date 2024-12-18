@@ -49,7 +49,7 @@ namespace TinyCompiler
         private void PopulateTokensTable()
         {
             tblTokens.Rows.Clear();
-            foreach (var token in Compiler.Scanner.Tokens)
+            foreach (var token in Compiler.TokenStream)
             {
                 tblTokens.Rows.Add(token.lex, token.type);
             }
