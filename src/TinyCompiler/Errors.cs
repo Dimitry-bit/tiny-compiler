@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace TinyCompiler
 {
@@ -10,5 +11,7 @@ namespace TinyCompiler
         {
             Error_List.Add($"[Line {lineNumber}]: {msg}.");
         }
+
+        public static bool HasError() => Error_List.Any();
     }
 }
