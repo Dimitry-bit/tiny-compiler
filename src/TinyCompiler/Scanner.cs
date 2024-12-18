@@ -159,6 +159,10 @@ namespace TinyCompiler
 
                 while (char.IsDigit(Peak()))
                     Read();
+            } else if (char.IsLetter(Peak())) {
+                Read();
+                Errors.Add(_linenumber, "illegal identifier");
+                return;
             }
 
             AddToken(TokenClass.Number);
