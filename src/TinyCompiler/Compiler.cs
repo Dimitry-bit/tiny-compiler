@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace TinyCompiler
 {
@@ -9,7 +9,7 @@ namespace TinyCompiler
 
         public static void Compile(string sourceCode)
         {
-            Errors.Error_List.Clear();
+            Errors.Clear();
             TokenStream.Clear();
             treeRoot = null;
 
@@ -17,7 +17,7 @@ namespace TinyCompiler
             Scanner scanner = new Scanner(sourceCode);
             TokenStream = scanner.Scan();
             if (Errors.HasError()) {
-                Errors.Error_List.Add($"Compilation failed, found {Errors.Error_List.Count} error{(Errors.Error_List.Count == 1 ? "" : "s")}.");
+                Errors.ReportError($"========== compile: {Errors.Count()} lex error ==========");
                 return;
             }
 
@@ -25,7 +25,7 @@ namespace TinyCompiler
             Parser parser = new Parser(TokenStream);
             treeRoot = parser.Parse();
             if (Errors.HasError()) {
-                Errors.Error_List.Add($"Compilation failed, found {Errors.Error_List.Count} error{(Errors.Error_List.Count == 1 ? "" : "s")}.");
+                Errors.ReportError($"========== compile: {Errors.Count()} parse error ==========");
                 return;
             }
 

@@ -58,14 +58,17 @@ namespace TinyCompiler
                 // Add main function
                 if (IsAtEnd())
                 {
-                    Error(PreviousToken(), "Expected main function.");
+                    Error(PreviousToken(), "expected main function");
                 }
                 else
                 {
                     n.Children.Add(Func());
                 }
             }
-            catch (ParseError) { }
+            catch (ParseError)
+            {
+                Errors.ReportError("parser: found fatal error... stopping");
+            }
 
             return n;
         }
@@ -84,7 +87,7 @@ namespace TinyCompiler
 
             n.Children.Add(Datatype());
             n.Children.Add(Consume(TokenClass.Identifier));
-            n.Children.Add(Consume(TokenClass.LeftParen, "Expect '(' after function name."));
+            n.Children.Add(Consume(TokenClass.LeftParen, "expected '(' after function name"));
 
             Node parameters = new Node("Parameters");
             while (!Check(TokenClass.RightParen))
@@ -93,12 +96,12 @@ namespace TinyCompiler
 
                 if (!Check(TokenClass.RightParen))
                 {
-                    parameters.Children.Add(Consume(TokenClass.Comma, "Expect ',' between parameters."));
+                    parameters.Children.Add(Consume(TokenClass.Comma, "expected ',' between parameters"));
                 }
             }
             n.Children.Add(parameters);
 
-            n.Children.Add(Consume(TokenClass.RightParen, "Expect ')' after parameters."));
+            n.Children.Add(Consume(TokenClass.RightParen, "expected ')' after parameters"));
 
             return n;
         }
@@ -107,7 +110,7 @@ namespace TinyCompiler
             Node n = new Node("Parameter");
 
             n.Children.Add(Datatype());
-            n.Children.Add(Consume(TokenClass.Identifier, "Expect parameter name."));
+            n.Children.Add(Consume(TokenClass.Identifier, "expected parameter name"));
 
             return n;
         }
@@ -115,10 +118,10 @@ namespace TinyCompiler
         private Node FuncBody() {
             Node n = new Node("Function Body");
 
-            n.Children.Add(Consume(TokenClass.LeftBrace, "Expect '{' before function body."));
+            n.Children.Add(Consume(TokenClass.LeftBrace, "expected '{' before function body"));
             n.Children.Add(Stmts());
             n.Children.Add(RetStmt());
-            n.Children.Add(Consume(TokenClass.RightBrace, "Expect '}' after function body."));
+            n.Children.Add(Consume(TokenClass.RightBrace, "expected '}' after function body"));
 
             return n;
         }
@@ -126,8 +129,8 @@ namespace TinyCompiler
         private Node FuncCall() {
             Node n = new Node("Function Call");
 
-            n.Children.Add(Consume(TokenClass.Identifier, "Expect function name."));
-            n.Children.Add(Consume(TokenClass.LeftParen, "Expect '(' after function name."));
+            n.Children.Add(Consume(TokenClass.Identifier, "expected function name"));
+            n.Children.Add(Consume(TokenClass.LeftParen, "expected '(' after function name"));
 
             Node args = new Node("Arguments");
             while (!Check(TokenClass.RightParen))
@@ -136,12 +139,12 @@ namespace TinyCompiler
 
                 if (!Check(TokenClass.RightParen))
                 {
-                    args.Children.Add(Consume(TokenClass.Comma, "Expect ',' between arguments."));
+                    args.Children.Add(Consume(TokenClass.Comma, "expected ',' between arguments"));
                 }
             }
             n.Children.Add(args);
 
-            n.Children.Add(Consume(TokenClass.RightParen, "Expect ')' after arguments."));
+            n.Children.Add(Consume(TokenClass.RightParen, "expected ')' after arguments"));
 
             return n;
         }
@@ -161,7 +164,7 @@ namespace TinyCompiler
                 return n;
             }
 
-            throw Error(Peek(), "Expected 'int', 'float', or 'string'.");
+            throw Error(Peek(), "expected 'int', 'float', or 'string'");
         }
 
         private Node Stmt() {
@@ -198,7 +201,7 @@ namespace TinyCompiler
                         n.Children.Add(Consume(TokenClass.Semicolon));
                         break;
                     default:
-                        throw Error(Peek(), "Expect statement.");
+                        throw Error(Peek(), "expected statement");
                         break;
                 }
 
@@ -358,7 +361,7 @@ namespace TinyCompiler
             }
             else
             {
-                Error(Peek(), "Expected conditional operator.");
+                Error(Peek(), "expected '<', '>', '<>', or '=' operator");
             }
             n.Children.Add(Expr());
 
@@ -470,7 +473,7 @@ namespace TinyCompiler
             }
             else
             {
-                Error(Peek(), "Expected number, string, identifier, or (expression).");
+                Error(Peek(), "expected number, string, identifier, or (expression)");
             }
 
             return n;
@@ -595,18 +598,18 @@ namespace TinyCompiler
 
         private Node Consume(TokenClass type)
         {
-            return Consume(type, $"Expected '{type.ToString().ToLowerInvariant()}'.");
+            return Consume(type, $"expected '{type.ToString().ToLowerInvariant()}'");
         }
 
         private ParseError Error(Token token, string message)
         {
             if (IsAtEnd())
             {
-                Errors.Error_List.Add($"[line {token.line}] Error at end: {message}");
+                Errors.ReportError(token.line, $"at end: {message}");
             }
             else
             {
-                Errors.Error_List.Add($"[line {token.line}] Error: at '{token.lex}': {message}");
+                Errors.ReportError(token.line, $"at '{token.lex}': {message}");
             }
 
             return new ParseError();

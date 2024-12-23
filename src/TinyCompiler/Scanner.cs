@@ -131,7 +131,7 @@ namespace TinyCompiler
                         }
                         else
                         {
-                            Errors.Add(_linenumber, $"unexpected lexeme '{c}'");
+                            Errors.ReportError(_linenumber, $"unexpected lexeme '{c}'");
                         }
                         break;
                 }
@@ -163,7 +163,7 @@ namespace TinyCompiler
                     Read();
             } else if (char.IsLetter(Peek())) {
                 Read();
-                Errors.Add(_linenumber, "illegal identifier");
+                Errors.ReportError(_linenumber, "illegal identifier");
                 return;
             }
 
@@ -188,7 +188,7 @@ namespace TinyCompiler
             if (Match('"'))
                 AddToken(TokenClass.StringLiteral);
             else
-                Errors.Add(_linenumber, "unterminated string, expected '\"'");
+                Errors.ReportError(_linenumber, "unterminated string, expected '\"'");
         }
 
         private void ReadComment()
@@ -209,7 +209,7 @@ namespace TinyCompiler
             if (Peek() == '/')
                 Read();
             else
-                Errors.Add(_linenumber, "unterminated comment, expected '*/'");
+                Errors.ReportError(_linenumber, "unterminated comment, expected '*/'");
         }
 
         private void AddToken(TokenClass type)
