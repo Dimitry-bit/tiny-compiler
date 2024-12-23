@@ -5,13 +5,21 @@ namespace TinyCompiler
 {
     public static class Errors
     {
-        public static List<string> Error_List = new List<string>();
+        private static readonly List<string> ErrorList = new List<string>();
 
-        public static void Add(int lineNumber, string msg)
+        public static List<string> GetAll() => ErrorList;
+
+        public static int Count() => ErrorList.Count();
+
+        public static bool HasError() => ErrorList.Any();
+
+        public static void Clear() => ErrorList.Clear();
+
+        public static void ReportError(string msg) => ErrorList.Add(msg);
+
+        public static void ReportError(int lineNumber, string msg)
         {
-            Error_List.Add($"[Line {lineNumber}]: {msg}.");
+            ReportError($"line:{lineNumber}: error: {msg}");
         }
-
-        public static bool HasError() => Error_List.Any();
     }
 }

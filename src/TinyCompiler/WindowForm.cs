@@ -58,10 +58,7 @@ namespace TinyCompiler
         private void PrintErrors()
         {
             tfErrors.Clear();
-            foreach (var error in Errors.Error_List)
-            {
-                tfErrors.Text += error + "\r\n";
-            }
+            tfErrors.Text = string.Join("\r\n", Errors.GetAll());
         }
 
         private void PopulateParseTree()
@@ -80,7 +77,7 @@ namespace TinyCompiler
 
             // Reset Global Data
             Compiler.TokenStream.Clear();
-            Errors.Error_List.Clear();
+            Errors.Clear();
         }
 
         private static TreeNode PrintParaseTree(Node root)
