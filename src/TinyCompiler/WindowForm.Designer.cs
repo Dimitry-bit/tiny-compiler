@@ -178,6 +178,7 @@
             // 
             // tfSourceCode
             // 
+            this.tfSourceCode.AcceptsTab = true;
             this.tfSourceCode.BackColor = System.Drawing.SystemColors.Window;
             this.tfSourceCode.DetectUrls = false;
             this.tfSourceCode.Location = new System.Drawing.Point(47, 32);
