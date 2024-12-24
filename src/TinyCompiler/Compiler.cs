@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace TinyCompiler
 {
@@ -9,9 +9,7 @@ namespace TinyCompiler
 
         public static void Compile(string sourceCode)
         {
-            Errors.Clear();
-            TokenStream.Clear();
-            treeRoot = null;
+            Clear();
 
             //Scanner
             Scanner scanner = new Scanner(sourceCode);
@@ -28,8 +26,13 @@ namespace TinyCompiler
                 Errors.ReportError($"========== compile: {Errors.Count()} parse error ==========");
                 return;
             }
+        }
 
-            //Sematic Analysis
+        public static void Clear()
+        {
+            Errors.Clear();
+            TokenStream.Clear();
+            treeRoot = null;
         }
     }
 }

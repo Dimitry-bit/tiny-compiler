@@ -1,5 +1,6 @@
-﻿using System.Drawing;
-using System;
+﻿using System;
+using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace TinyCompiler
@@ -10,36 +11,21 @@ namespace TinyCompiler
         {
             InitializeComponent();
 
-            // Subscribe to the necessary events
+            // Subscribe to the necessary events for line number gutter
             tfSourceCode.TextChanged += (object sender, EventArgs e) => Invalidate();
             tfSourceCode.VScroll += (object sender, EventArgs e) => Invalidate();
-            tfSourceCode.KeyDown += RichTextBox1_KeyDown;
+            tfSourceCode.KeyDown += HandleRichTextBoxPaste;
         }
 
-        private void RichTextBox1_KeyDown(object sender, KeyEventArgs e)
+        protected override void OnPaint(PaintEventArgs e)
         {
-            // Check if Ctrl+V is pressed (paste command)
-            if (e.Control && e.KeyCode == Keys.V)
-            {
-                // Check if clipboard contains plain text
-                if (Clipboard.ContainsText())
-                {
-                    // Get plain text from clipboard
-                    string plainText = Clipboard.GetText(TextDataFormat.Text);
-
-                    // Insert the plain text into the RichTextBox (at current cursor position)
-                    tfSourceCode.SelectedText = plainText;
-                }
-
-                // Prevent default paste behavior (i.e., disabling rich text paste)
-                e.SuppressKeyPress = true;
-            }
+            base.OnPaint(e);
+            DrawLineNumbers(tfSourceCode, e.Graphics);
         }
 
-        private void btnCompile_Click(object sender, System.EventArgs e)
+        private void btnCompile_Click(object sender, EventArgs e)
         {
-            string sourceCode = tfSourceCode.Text;
-            Compiler.Compile(sourceCode);
+            Compiler.Compile(tfSourceCode.Text);
 
             PopulateTokensTable();
             PopulateParseTree();
@@ -64,10 +50,10 @@ namespace TinyCompiler
         private void PopulateParseTree()
         {
             treePrase.Nodes.Clear();
-            treePrase.Nodes.Add(PrintParaseTree(Compiler.treeRoot));
+            treePrase.Nodes.Add(PrintParseTree(Compiler.treeRoot));
         }
 
-        private void btnClear_Click(object sender, System.EventArgs e)
+        private void btnClear_Click(object sender, EventArgs e)
         {
             // Resest UI Elements
             tfSourceCode.Clear();
@@ -75,12 +61,10 @@ namespace TinyCompiler
             tblTokens.Rows.Clear();
             treePrase.Nodes.Clear();
 
-            // Reset Global Data
-            Compiler.TokenStream.Clear();
-            Errors.Clear();
+            Compiler.Clear();
         }
 
-        private static TreeNode PrintParaseTree(Node root)
+        private static TreeNode PrintParseTree(Node root)
         {
             TreeNode tree = new TreeNode("Parse Tree");
             TreeNode treeRoot = PrintTree(root);
@@ -103,53 +87,63 @@ namespace TinyCompiler
             TreeNode tree = new TreeNode(root.Name);
             foreach (Node child in root.Children)
             {
-                if (child == null)
+                if (child != null)
                 {
-                    continue;
+                    tree.Nodes.Add(PrintTree(child));
                 }
-
-                tree.Nodes.Add(PrintTree(child));
             }
 
             return tree;
         }
 
-        protected override void OnPaint(PaintEventArgs e)
+        private void HandleRichTextBoxPaste(object sender, KeyEventArgs e)
         {
-            base.OnPaint(e);
-            DrawLineNumbers(e.Graphics);
+            if (e.Control && (e.KeyCode == Keys.V))
+            {
+                if (Clipboard.ContainsText())
+                {
+                    string plainText = Clipboard.GetText(TextDataFormat.Text);
+                    tfSourceCode.SelectedText = plainText;
+                }
+
+                // Prevent default paste behavior (i.e., disabling rich text paste)
+                e.SuppressKeyPress = true;
+            }
         }
 
-        private void DrawLineNumbers(Graphics graphics)
+        private void DrawLineNumbers(RichTextBox richTextBox, Graphics graphics)
         {
-            // Set the font and brush for the line numbers
-            Font lineNumberFont = new Font("Consolas", 10);
-            Brush lineNumberBrush = Brushes.Gray;
+            Font font = richTextBox.Font;
+            Brush brush = Brushes.Gray;
 
-            // Calculate the height of a single line based on the font
-            // Use GetLineFromCharIndex and GetPositionFromCharIndex to get the correct line height
-            int lineHeight =  tfSourceCode.GetPositionFromCharIndex(tfSourceCode.GetFirstCharIndexFromLine(1)).Y
-                          - tfSourceCode.GetPositionFromCharIndex(tfSourceCode.GetFirstCharIndexFromLine(0)).Y;
+            const float xPosMargin = 4.0f;
+            float yPos = richTextBox.Top;
 
-            // Get the first and last visible lines
-            int firstVisibleLine = tfSourceCode.GetLineFromCharIndex(tfSourceCode.GetCharIndexFromPosition(new Point(0, 4)));
-            int lastVisibleLine = tfSourceCode.GetLineFromCharIndex(tfSourceCode.GetCharIndexFromPosition(new Point(0, tfSourceCode.ClientRectangle.Bottom)));
+            int firstIndex = richTextBox.GetCharIndexFromPosition(Point.Empty);
+            int firstLine = richTextBox.GetLineFromCharIndex(firstIndex);
 
-            // Get the position of the RichTextBox control (Top is the distance from the top of the form)
-            int richTextBoxTop = tfSourceCode.Top;
-            int richTextBoxLeft = tfSourceCode.Left;
+            Point bottomLeft = new Point(0, richTextBox.ClientRectangle.Height);
+            int lastIndex = richTextBox.GetCharIndexFromPosition(bottomLeft);
+            int lastLine = richTextBox.GetLineFromCharIndex(lastIndex);
 
-            // Set the initial position for drawing the line numbers
-            // Align with the left of the RichTextBox
-            int xPosition = richTextBoxLeft;
-            int yPosition = richTextBoxTop + tfSourceCode.GetPositionFromCharIndex(tfSourceCode.GetFirstCharIndexFromLine(firstVisibleLine)).Y;
-
-            // Draw the line numbers for all visible lines
-            for (int i = firstVisibleLine; i <= lastVisibleLine; i++)
+            if (richTextBox.Lines.Any() && string.IsNullOrEmpty(richTextBox.Lines.Last()))
             {
-                SizeF size = graphics.MeasureString((i + 1).ToString(), lineNumberFont);
-                graphics.DrawString((i + 1).ToString(), lineNumberFont, lineNumberBrush, xPosition - size.Width, yPosition);
-                yPosition += lineHeight;  // Move to the next line position
+                lastLine++;
+            }
+
+            int maxLines = richTextBox.ClientRectangle.Height / Font.Height;
+            for (int i = firstLine; (i <= lastLine) && (i - firstLine <= maxLines); i++)
+            {
+                string numStr = (i + 1).ToString();
+                PointF pos = new PointF(richTextBox.Left - xPosMargin, yPos);
+                yPos += font.Height;
+
+                using (StringFormat sf = new StringFormat())
+                {
+                    sf.Alignment = StringAlignment.Far;
+                    sf.LineAlignment = StringAlignment.Near;
+                    graphics.DrawString(numStr, font, brush, pos, sf);
+                }
             }
         }
     }
