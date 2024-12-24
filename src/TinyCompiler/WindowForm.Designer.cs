@@ -72,6 +72,7 @@
             this.tblTokens.Margin = new System.Windows.Forms.Padding(8);
             this.tblTokens.Name = "tblTokens";
             this.tblTokens.ReadOnly = true;
+            this.tblTokens.RowHeadersVisible = false;
             this.tblTokens.RowHeadersWidth = 50;
             this.tblTokens.RowTemplate.Height = 24;
             this.tblTokens.Size = new System.Drawing.Size(400, 282);
