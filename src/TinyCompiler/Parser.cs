@@ -49,7 +49,7 @@ namespace TinyCompiler
                 }
                 catch (ParseError)
                 {
-                    Advance();
+                    SynchronizeFunc();
                 }
             }
 
@@ -515,6 +515,29 @@ namespace TinyCompiler
                     case TokenClass.Write:
                     case TokenClass.Repeat:
                     case TokenClass.If:
+                        return;
+                }
+
+                Advance();
+            }
+        }
+
+        private void SynchronizeFunc()
+        {
+            Advance();
+
+            while (!IsAtEnd())
+            {
+                if (PreviousToken().type == TokenClass.RightBrace)
+                {
+                    return;
+                }
+
+                switch (Peek().type)
+                {
+                    case TokenClass.Int:
+                    case TokenClass.Float:
+                    case TokenClass.String:
                         return;
                 }
 
