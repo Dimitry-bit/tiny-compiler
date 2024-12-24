@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WindowForm));
             this.btnCompile = new System.Windows.Forms.Button();
             this.tblTokens = new System.Windows.Forms.DataGridView();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -206,12 +207,12 @@
             this.Controls.Add(this.tblTokens);
             this.Controls.Add(this.btnCompile);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(2);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "WindowForm";
             this.Padding = new System.Windows.Forms.Padding(24);
-            this.ShowIcon = false;
             this.Text = "Tiny Compiler (GUI)";
             ((System.ComponentModel.ISupportInitialize)(this.tblTokens)).EndInit();
             this.ResumeLayout(false);
