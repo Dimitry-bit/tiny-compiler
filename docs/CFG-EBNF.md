@@ -59,7 +59,7 @@
 
 27. *Datatype* -> __int__ | __float__ | __string__
 
-28. *Expression* -> *Term* ( ( __-__ | __+__ ) *Term* )?
+28. *Expression* -> *Term* ( ( __-__ | __+__ ) *Expression* )?
 
 29. *Term* -> *Factor* ( ( __*__ | __/__ ) *Term* )?
 

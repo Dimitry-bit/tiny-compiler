@@ -447,7 +447,7 @@ namespace TinyCompiler
             if (Match(TokenClass.Minus, TokenClass.Plus))
             {
                 n.Children.Add(PreviousNode());
-                n.Children.Add(Term());
+                n.Children.Add(Expr());
             }
 
             return n;

@@ -67,7 +67,7 @@
 
 31. *Datatype* -> __int__ | __float__ | __string__
 
-32. *Expression* -> *Term* ( ( __-__ | __+__ ) *Term*  | $\epsilon$ )
+32. *Expression* -> *Term* ( ( __-__ | __+__ ) *Expression*  | $\epsilon$ )
 
 33. *Term* -> *Factor* ( ( __*__ | __/__ ) *Term* | $\epsilon$ )
 
